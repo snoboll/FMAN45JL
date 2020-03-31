@@ -1,0 +1,31 @@
+%% task5
+%training
+lambda_grid = exp(linspace(log(0.1), log(10), 50));
+
+[wopt,lambdaopt,RMSEval,RMSEest] = skeleton_lasso_cv(t, X, lambda_grid, 10);
+
+%% plot
+figure(1)
+clf;
+hold on;
+plot(lambda_grid, RMSEest);
+plot(lambda_grid, RMSEval);
+xline(lambdaopt, '--', ('Optimal lambda'));
+xlabel('lambda');
+ylabel('RMSE');
+set(gca, 'Xscale', 'log');
+legend('RMSEest', 'RMSEval');
+
+%% plotting task 4 with optimal lambda
+w1 = skeleton_lasso_ccd(t, X, 0.1);
+nzw1=nnz(w1)
+
+figure(1)
+clf;
+hold on;
+plot(n, t, 'O');
+plot(n, X*wopt, 'O');
+plot(ninterp, Xinterp*wopt);
+legend('target', 'lambda = 0.2812 = optlambda', 'interpolation');
+xlabel('Time');
+
