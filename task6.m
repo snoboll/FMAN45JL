@@ -1,8 +1,8 @@
 %% task 6
-%training
-lambda_grid = exp(linspace(log(0.1), log(10), 5));
+%training 
+lambda_grid = exp(linspace (log(0.001), log(1), 30)) %last param = number of lambdas
 
-[Wopt,lambdaopt,RMSEval,RMSEest] = skeleton_multiframe_lasso_cv(Ttrain, Xaudio, lambda_grid, 2);
+[Wopt,lambdaopt,RMSEval,RMSEest] = skeleton_multiframe_lasso_cv(Ttrain, Xaudio, lambda_grid, 3); % last param = number of folds
 
 %% plot
 figure(1)

@@ -89,6 +89,7 @@ for kframe = 1:Nframes
     t = T(framelocation + idx);
     Wopt(:,kframe) = skeleton_lasso_ccd(t, X, lambdaopt);
     framelocation = framelocation + framehop;
+    disp(['Frame: ' num2str(kframe)]);
 end
 
 RMSEval = sqrt(MSEval);
