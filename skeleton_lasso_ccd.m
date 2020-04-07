@@ -54,7 +54,7 @@ for kiter = 1:Niter
         kind = kindvec_random(ksweep); % Pick out current coordinate to modify.
         
         x = X(:, kind); 
-        r = t - X*w; % ... put impact of old w(kind) back into the residual.
+        r = r + x*w(kind); % ... put impact of old w(kind) back into the residual.
         
         if abs(x.' * r) > lambda
             w(kind) = x.' * r * (abs(x.' * r) - lambda) / (x.' * x * abs(x.' * r));% ... update the lasso estimate at coordinate kind
@@ -62,7 +62,7 @@ for kiter = 1:Niter
             w(kind) = 0;
         end
         
-        r = t - X*w; % ... remove impact of newly estimated w(kind) from residual.
+        r = r - x*w(kind); % ... remove impact of newly estimated w(kind) from residual.
         
         wsup(kind) = double(abs(w(kind))>zero_tol); % update whether w(kind) is zero or not.
    
