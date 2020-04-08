@@ -25,6 +25,6 @@ hold on;
 plot(n, t, 'O');
 plot(n, X*w4, 'O');
 plot(ninterp, Xinterp*w4);
-legend('target', 'lambda = 2.2230 = optlambda', 'interpolation');
+legend('target', 'lambda = 2.0236 = optlambda', 'interpolation');
 xlabel('Time');
 

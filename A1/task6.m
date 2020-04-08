@@ -19,6 +19,6 @@ legend('RMSEest', 'RMSEval');
 
 %% task 7
 
-[Yclean] = lasso_denoise(Ttest, Xaudio, lambdaopt_audio);
+[Yclean] = lasso_denoise(Ttest, Xaudio, 0.1);
 
 save('denoised_audio','Yclean','fs');

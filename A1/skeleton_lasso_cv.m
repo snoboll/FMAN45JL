@@ -24,7 +24,7 @@ SEest = zeros(K,Nlam);
 
 
 % cross-validation indexing
-randomind = NaN; % Select random indices for validation and estimation
+randomind = randperm(N); % Select random indices for validation and estimation
 location = 0; % Index start when moving through the folds
 Nval = floor(N/K); % How many samples per fold
 hop = Nval; % How many samples to skip when moving to the next fold.
@@ -39,13 +39,13 @@ for kfold = 1:K
     
     for klam = 1:Nlam
         
-        what = skeleton_lasso_ccd(t(estind), X(estind,:), lambdavec(klam), wold); % Calculate LASSO estimate on estimation indices for the current lambda-value.
+        what = skeleton_lasso_ccd(t(randomind(estind)), X(randomind(estind),:), lambdavec(klam), wold); % Calculate LASSO estimate on estimation indices for the current lambda-value.
         
-        t_val = X(valind,:) * what;
-        t_est = X(estind,:) * what;
+        t_val = X(randomind(valind),:) * what;
+        t_est = X(randomind(estind),:) * what;
         
-        SEval(kfold,klam) = sum((t(valind) - t_val).^2); % Calculate validation error for this estimate
-        SEest(kfold,klam) = sum((t(estind) - t_est).^2); % Calculate estimation error for this estimate
+        SEval(kfold,klam) = sum((t(randomind(valind)) - t_val).^2); % Calculate validation error for this estimate
+        SEest(kfold,klam) = sum((t(randomind(estind)) - t_est).^2); % Calculate estimation error for this estimate
         
         wold = what; % Set current estimate as old estimate for next lambda-value.
         disp(['Fold: ' num2str(kfold) ', lambda-index: ' num2str(klam)]) % Display current fold and lambda-index.
