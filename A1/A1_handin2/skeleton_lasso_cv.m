@@ -1,4 +1,4 @@
-function [wopt,lambdaopt,RMSEval,RMSEest] = lasso_cv(t,X,lambdavec,K)
+function [wopt,lambdaopt,RMSEval,RMSEest] = skeleton_lasso_cv(t,X,lambdavec,K)
 % [wopt,lambdaopt,VMSE,EMSE] = lasso_cv(t,X,lambdavec)
 % Calculates the LASSO solution problem and trains the hyperparameter using
 % cross-validation.
@@ -24,28 +24,32 @@ SEest = zeros(K,Nlam);
 
 
 % cross-validation indexing
-randomind = NaN; % Select random indices for validation and estimation
-location = 1; % Index start when moving through the folds
+randomind = randperm(N); % Select random indices for validation and estimation
+location = 0; % Index start when moving through the folds
 Nval = floor(N/K); % How many samples per fold
 hop = Nval; % How many samples to skip when moving to the next fold.
 
 
 for kfold = 1:K
    
-    valind = [location:location+Nval]; % Select validation indices
-    estind = [1:location-1 location+Nval+1:N]; % Select estimation indices
+    valind = [location+1:location+Nval]; % Select validation indices
+    estind = [1:location location+Nval+1:N]; % Select estimation indices
     assert(isempty(intersect(valind,estind)), "There are overlapping indices in valind and estind!"); % assert empty intersection between valind and estind
     wold = zeros(M,1); % Initialize estimate for warm-starting.
     
     for klam = 1:Nlam
         
-        what = skeleton_lasso_ccd(t(estind), X(estind), lambdavec(klam), wold) % Calculate LASSO estimate on estimation indices for the current lambda-value.
+        what = skeleton_lasso_ccd(t(randomind(estind)), X(randomind(estind),:), lambdavec(klam), wold); % Calculate LASSO estimate on estimation indices for the current lambda-value.
         
-        t_val = X(valind) * what;
-        t_est = X(estind) * what;
+        t_val = X(randomind(valind),:) * what;
+        t_est = X(randomind(estind),:) * what;
         
-        SEval(kfold,klam) = sum((t(valind) - t_val)^2); % Calculate validation error for this estimate
-        SEest(kfold,klam) = sum((t(estind) - t_est)^2); % Calculate estimation error for this estimate
+        %SEval(kfold,klam) = sum((t(randomind(valind)) - t_val).^2); % Calculate validation error for this estimate
+        %SEest(kfold,klam) = sum((t(randomind(estind)) - t_est).^2); % Calculate estimation error for this estimate
+        
+        SEval(kfold,klam) = (1/Nval)*norm(t(randomind(valind)) - t_val)^2;
+        SEest(kfold,klam) = (1/(N-Nval))*norm(t(randomind(estind)) - t_est)^2;
+        
         
         wold = what; % Set current estimate as old estimate for next lambda-value.
         disp(['Fold: ' num2str(kfold) ', lambda-index: ' num2str(klam)]) % Display current fold and lambda-index.
@@ -61,13 +65,11 @@ MSEest = mean(SEest,1); % Calculate MSE_est as mean of estimation error over the
 
 RMSEval = sqrt(MSEval);
 RMSEest = sqrt(MSEest);
-RMSEsum = sum(RMSEval, )
 
-lambdaopt = lambdavec(optind); % Select optimal lambda 
+[val, ind] = min(RMSEval);
+lambdaopt = lambdavec(ind); % Select optimal lambda 
 
-
-
-wopt = NaN % Calculate LASSO estimate for selected lambda using all data.
+wopt = skeleton_lasso_ccd(t, X, lambdaopt); % Calculate LASSO estimate for selected lambda using all data.
 
 end
 

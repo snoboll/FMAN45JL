@@ -17,15 +17,14 @@ set(gca, 'Xscale', 'log');
 legend('RMSEest', 'RMSEval');
 
 %% plotting task 4 with optimal lambda
-w1 = skeleton_lasso_ccd(t, X, 0.1);
-nzw1=nnz(w1)
+w4 = skeleton_lasso_ccd(t, X, lambdaopt);
 
-figure(1)
+figure(2)
 clf;
 hold on;
 plot(n, t, 'O');
-plot(n, X*wopt, 'O');
-plot(ninterp, Xinterp*wopt);
-legend('target', 'lambda = 0.2812 = optlambda', 'interpolation');
+plot(n, X*w4, 'O');
+plot(ninterp, Xinterp*w4);
+legend('target', 'lambda = 2.0236 = optlambda', 'interpolation');
 xlabel('Time');
 
